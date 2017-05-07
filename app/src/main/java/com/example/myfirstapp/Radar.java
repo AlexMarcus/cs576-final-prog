@@ -18,6 +18,7 @@ import android.widget.PopupWindow;
 import java.util.ArrayList;
 
 import static com.example.myfirstapp.R.layout.activity_radar;
+import static java.lang.Math.round;
 
 /**
  * Created by alexmarcus on 4/18/17.
@@ -139,11 +140,11 @@ public class Radar extends View {
                 } else {
                     x = l.init_x - (float) Math.sqrt((des_dist) / (1 + (m * m)));
                 }
-                System.out.println("X:");
-                System.out.println(x);
+                //System.out.println("X:");
+                //System.out.println(x);
                 float y = x*m + b;
-                System.out.println("Y:");
-                System.out.println(y);
+                //System.out.println("Y:");
+                //System.out.println(y);
 
                 l.final_x = x;
                 l.final_y = y;
@@ -199,6 +200,49 @@ public class Radar extends View {
 
     public interface radarListener{
         void onRadarTouch(float val);
+    }
+
+    public void clearRadar() {
+        int i;
+        //System.out.println(points.size());
+        int size = points.size();
+        for(i=0;i<size;i++){
+            //System.out.println(i);
+
+            points.remove(0);
+            lines.remove(0);
+        }
+        count = 0;
+        postInvalidate();
+
+    }
+
+    public String getLines(){
+        float centerx = this.getX() + this.getWidth()  / 2;
+        float centery = this.getY() + this.getHeight() / 2;
+        int i;
+        String retVal = "";
+        for(i=0;i<lines.size();i++){
+            if(round(lines.get(i).final_y) == 0) {
+                lines.get(i).final_y = lines.get(i).init_y;
+            }
+            if(round(lines.get(i).final_x) == 0) {
+                lines.get(i).final_x = lines.get(i).init_x;
+            }
+            float x1 = (lines.get(i).init_x - centerx)/30;
+            float y1 = (centery - lines.get(i).init_y)/30;
+            float x2 = (lines.get(i).final_x - centerx)/30;
+            float y2 = (centery - lines.get(i).final_y)/30;
+
+            retVal = retVal + Float.toString(x1) + " " + Float.toString(y1) + ", " + Float.toString(x2) + " " + Float.toString(y2);
+            if(i != lines.size()-1) retVal += ";";
+
+        }
+        retVal += "\n";
+        //System.out.println(retVal);
+
+        return retVal;
+
     }
 
 

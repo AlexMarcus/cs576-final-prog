@@ -12,10 +12,12 @@
         android:id="@+id/sendEnemies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
+        android:onClick="sendEnemies"
         android:text="SEND!"
         android:textSize="30sp"
         android:visibility="invisible"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linear" />
@@ -39,6 +41,29 @@
             custom:labelPosition="left"
             custom:showText="true" />
     </LinearLayout>
+
+    <EditText
+        android:id="@+id/ip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="9dp"
+        android:contentDescription="IP Address"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="149.125.39.235"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:onClick="connectSocket"
+        android:text="Connect"
+        app:layout_constraintLeft_toRightOf="@+id/ip"
+        tools:layout_editor_absoluteY="2dp" />
 
 </android.support.constraint.ConstraintLayout>
 

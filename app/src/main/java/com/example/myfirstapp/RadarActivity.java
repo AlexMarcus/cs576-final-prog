@@ -6,11 +6,16 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.view.ViewGroup.LayoutParams;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 
 public class RadarActivity extends AppCompatActivity {
@@ -19,8 +24,15 @@ public class RadarActivity extends AppCompatActivity {
     private PopupWindow mPopup;
     private LinearLayout lin;
 
+    private EditText IP;
+
+    DatagramSocket socket;
+    InetAddress address;
+    String addr;
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_radar);
@@ -30,8 +42,8 @@ public class RadarActivity extends AppCompatActivity {
 
             @Override
             public void onRadarTouch(float val){
-                System.out.println("in activity");
-                System.out.println(val);
+                //System.out.println("in activity");
+                //System.out.println(val);
                 Button send = (Button) findViewById(R.id.sendEnemies);
                 send.setVisibility(View.VISIBLE);
                 if(val == -1){
@@ -83,6 +95,28 @@ public class RadarActivity extends AppCompatActivity {
 
     }
 
+    public void connectSocket(View view) throws IOException{
+        IP = (EditText) findViewById(R.id.ip);
+        addr = IP.getText().toString();
+        try {
+            socket = new DatagramSocket();
+            System.out.println(addr);
+            address = InetAddress.getByName(addr);
+        }
+        catch(IOException e){
+            System.out.println(e);
+        }
+    }
+
+    public void sendEnemies(View view) throws IOException{
+        String lines = pc.getLines();
+        pc.clearRadar();
+        byte[] sendBuf = lines.getBytes();
+
+        DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 12000);
+        socket.send(packet);
+
+    }
 
 
 
