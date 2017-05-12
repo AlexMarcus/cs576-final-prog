@@ -26,9 +26,16 @@ public class RadarActivity extends AppCompatActivity {
 
     private EditText IP;
 
-    DatagramSocket socket;
-    InetAddress address;
-    String addr;
+    private long lastSend;
+
+    private DatagramSocket socket;
+    private InetAddress address;
+    private String addr;
+
+    private String lines;
+
+    private int connected;
+
 
 
     @Override
@@ -93,31 +100,82 @@ public class RadarActivity extends AppCompatActivity {
 
         });
 
+        lastSend = System.currentTimeMillis();
+
     }
 
     public void connectSocket(View view) throws IOException{
-        IP = (EditText) findViewById(R.id.ip);
-        addr = IP.getText().toString();
-        try {
-            socket = new DatagramSocket();
-            System.out.println(addr);
-            address = InetAddress.getByName(addr);
-        }
-        catch(IOException e){
-            System.out.println(e);
-        }
+
+            IP = (EditText) findViewById(R.id.ip);
+            addr = IP.getText().toString();
+            new Thread() {
+                public void run() {
+                    try {
+                        socket = new DatagramSocket();
+                        System.out.println(addr);
+                        address = InetAddress.getByName(addr);
+                        byte[] sendBuf = "connected".getBytes();
+
+                        DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 12000);
+                        socket.send(packet);
+                        connected = 1;
+                    } catch (IOException e) {
+                        System.out.println(e);
+                    }
+
+                }
+            }.start();
+
     }
 
     public void sendEnemies(View view) throws IOException{
-        String lines = pc.getLines();
-        pc.clearRadar();
-        byte[] sendBuf = lines.getBytes();
+        long curTime = System.currentTimeMillis();
+        lines = pc.getLines();
 
-        DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 12000);
-        socket.send(packet);
+
+        if(curTime - lastSend > pc.getNumEnemies()*1000) {
+            lastSend = curTime;
+
+
+            pc.clearRadar();
+
+            new Thread() {
+                public void run() {
+
+                    try {
+                        byte[] sendBuf = lines.getBytes();
+                        DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 12000);
+                        socket.send(packet);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                }
+            }.start();
+        }
 
     }
 
+    public void disconnectSocket(View view) throws IOException{
+        if(connected == 1) {
+            IP = (EditText) findViewById(R.id.ip);
+            addr = IP.getText().toString();
+            new Thread() {
+                public void run() {
+                    try {
+
+                        address = InetAddress.getByName(addr);
+                        byte[] sendBuf = "disconnected".getBytes();
+
+                        DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, 12000);
+                        socket.send(packet);
+                    } catch (IOException e) {
+                        System.out.println(e);
+                    }
+                }
+            }.start();
+        }
+
+    }
 
 
 }

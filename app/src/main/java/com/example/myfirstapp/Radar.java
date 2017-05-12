@@ -245,6 +245,8 @@ public class Radar extends View {
 
     }
 
+    public int getNumEnemies(){return lines.size();}
+
 
 }
 
