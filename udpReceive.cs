@@ -12,9 +12,10 @@ public class udpReceive : MonoBehaviour {
 
 	Thread receiveThread;
 	UdpClient client;
-	public GameObject Spawner;
-	EnemySpawner spawnScript;
+	public GameObject enemySpawner;
+	Spawner spawnScript;
 	public int port;
+	public IPAddress connectedIP;
 
 	public string lastReceivedUDPPacket = "";
 	public string allReceivedUDPPackets="";
@@ -28,19 +29,10 @@ public class udpReceive : MonoBehaviour {
 			text = Console.ReadLine ();
 		} while(!text.Equals ("exit"));
 	}
-
+	// Use this for initialization
 	void Start () {
 		init ();
-		spawnScript = Spawner.GetComponent<EnemySpawner> ();
-	}
-
-	void OnGUI(){
-		Rect rectObj = new Rect (40, 10, 200, 400);
-		GUIStyle style = new GUIStyle ();
-		style.alignment = TextAnchor.UpperLeft;
-		GUI.Box(rectObj, "# UDPReceive\n 127.0.0.1 " + port + " #\n" +
-			"Last Packet: " + lastReceivedUDPPacket +
-			"\nAll Messages:" + allReceivedUDPPackets, style);
+		spawnScript = enemySpawner.GetComponent<Spawner> ();
 	}
 
 	private void init(){
@@ -59,12 +51,10 @@ public class udpReceive : MonoBehaviour {
 		while (true) {
 			try{
 				IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
+				connectedIP = anyIP.Address;
 				byte[] data = client.Receive(ref anyIP);
 
 				string text = Encoding.UTF8.GetString(data);
-				print(text);
-				/*text = text.TrimEnd(';');
-				text = text.TrimEnd(';');*/
 				spawnScript.locationsStr = text;
 
 				print(">>" + text);
